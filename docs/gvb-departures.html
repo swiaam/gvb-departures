@@ -50,15 +50,15 @@ async function fetchDepartures(lineKey) {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const STOPS = [
-  { id:"f3",  label:"Veer Buiksloterweg",  lineKey:"GVB_901_1", fromStop:"Buiksloterweg", line:"F3", towards:"Centraal"      },
-  { id:"f2",  label:"Veer IJplein",         lineKey:"GVB_902_1", fromStop:"IJplein",        line:"F2", towards:"Centraal"      },
-  { id:"f1a", label:"Veer Azartplein",      lineKey:"GVB_915_2", fromStop:"Azartplein",     line:"F1", towards:"Zamenhofstraat"},
-  { id:"f1b", label:"Veer Zamenhofstraat",  lineKey:"GVB_915_1", fromStop:"Zamenhofstraat", line:"F1", towards:"Azartplein"    },
-  { id:"f4",  label:"Veer NDSM",            lineKey:"GVB_906_1", fromStop:"NDSM",           line:"F4", towards:"Centraal"      },
-  { id:"f7",  label:"Veer NDSM (F7)",        lineKey:"GVB_903_2", fromStop:"NDSM",        line:"F7", towards:"Pontsteiger" },
-  { id:"f7r", label:"Veer Pontsteiger (F7)", lineKey:"GVB_903_1", fromStop:"Pontsteiger", line:"F7", towards:"NDSM"        },
-  { id:"f6",  label:"Veer Distelweg",        lineKey:"GVB_900_1", fromStop:"Distelweg",   line:"F6", towards:"Pontsteiger" },
-  { id:"f6r", label:"Veer Pontsteiger (F6)", lineKey:"GVB_900_2", fromStop:"Pontsteiger", line:"F6", towards:"Distelweg"   },
+  { id:"f3",  label:"Veer Buiksloterweg",  lineKey:"GVB_901_1", fromStop:"Buiksloterweg", line:"F3", hint:"Centraal"      },
+  { id:"f2",  label:"Veer IJplein",         lineKey:"GVB_902_1", fromStop:"IJplein",        line:"F2", hint:"Centraal"      },
+  { id:"f1a", label:"Veer Azartplein",      lineKey:"GVB_915_2", fromStop:"Azartplein",     line:"F1", hint:"Zamenhofstraat"},
+  { id:"f1b", label:"Veer Zamenhofstraat",  lineKey:"GVB_915_1", fromStop:"Zamenhofstraat", line:"F1", hint:"Azartplein"    },
+  { id:"f4",  label:"Veer NDSM",            lineKey:"GVB_906_1", fromStop:"NDSM",           line:"F4", hint:"Centraal"      },
+  { id:"f7",  label:"Veer NDSM (F7)",        lineKey:"GVB_903_2", fromStop:"NDSM",        line:"F7", hint:"Pontsteiger" },
+  { id:"f7r", label:"Veer Pontsteiger (F7)", lineKey:"GVB_903_1", fromStop:"Pontsteiger", line:"F7", hint:"NDSM"        },
+  { id:"f6",  label:"Veer Distelweg",        lineKey:"GVB_900_1", fromStop:"Distelweg",   line:"F6", hint:"Pontsteiger" },
+  { id:"f6r", label:"Veer Pontsteiger (F6)", lineKey:"GVB_900_2", fromStop:"Pontsteiger", line:"F6", hint:"Distelweg"   },
 ];
 
 const GROUPS = [
@@ -109,9 +109,9 @@ function StopCard({ stop }) {
       if (deps.length === 0) {
         const now = Date.now();
         setDeps([
-          { destination:stop.towards, stopName:stop.fromStop, expected:new Date(now+6*60000+22000) },
-          { destination:stop.towards, stopName:stop.fromStop, expected:new Date(now+26*60000+22000) },
-          { destination:stop.towards, stopName:stop.fromStop, expected:new Date(now+46*60000+22000) },
+          { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+6*60000+22000) },
+          { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+26*60000+22000) },
+          { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+46*60000+22000) },
         ]);
         setState("demo");
       }
@@ -131,7 +131,7 @@ function StopCard({ stop }) {
       <div style=${{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"8px" }}>
         <span style=${{ background:"#C8392B", color:"#fff", padding:"2px 7px", borderRadius:"5px", fontFamily:"'Share Tech Mono',monospace", fontSize:"12px", fontWeight:"700", letterSpacing:"1px" }}>${stop.line}</span>
         <span style=${{ flex:1, fontSize:"14px", fontWeight:"600", color:"#DEE6F5", fontFamily:"'Barlow Condensed',sans-serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>${stop.label}</span>
-        ${stop.towards && html`<span style=${{ fontSize:"11px", color:"#4A6280", fontFamily:"'Barlow',sans-serif" }}>→ ${stop.towards}</span>`}
+        ${stop.hint && html`<span style=${{ fontSize:"11px", color:"#4A6280", fontFamily:"'Barlow',sans-serif" }}>→ ${stop.hint}</span>`}
         ${state==="demo" && html`<span style=${{ background:"rgba(232,121,249,0.12)", color:"#E879F9", fontSize:"9px", padding:"2px 5px", borderRadius:"4px", letterSpacing:"1.5px" }}>DEMO</span>`}
       </div>
       ${state==="loading" ? html`
@@ -142,7 +142,7 @@ function StopCard({ stop }) {
         <${Fragment}>
           <div style=${{ display:"flex", alignItems:"flex-end", gap:"10px", marginBottom:"6px" }}>
             <span style=${{ fontFamily:"'Share Tech Mono',monospace", fontSize:"46px", lineHeight:1, letterSpacing:"-1px", color, textShadow:`0 0 20px ${glow}`, transition:"color .5s" }}>${fmtCountdown(next.expected)}</span>
-            <span style=${{ fontSize:"11px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ ${next.destination||stop.towards}</span>
+            <span style=${{ fontSize:"11px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ ${next.destination||stop.hint}</span>
           </div>
           ${deps.slice(1).length > 0 && html`
             <div style=${{ borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:"6px", display:"flex", gap:"12px" }}>
