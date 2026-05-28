@@ -33,7 +33,6 @@ const html = htm.bind(h);
 async function fetchDepartures(lineKey) {
   const target = encodeURIComponent(`http://v0.ovapi.nl/line/${lineKey}`);
   const sources = [
-    `https://api.allorigins.win/raw?url=${target}`,
     `https://api.codetabs.com/v1/proxy?quest=${target}`,
   ];
   const tryFetch = async (src) => {
