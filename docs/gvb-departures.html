@@ -134,7 +134,7 @@ function StopCard({ stop, onNextDep }) {
       <div style=${{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"8px" }}>
         <span style=${{ background:"#C8392B", color:"#fff", padding:"2px 7px", borderRadius:"5px", fontFamily:"'Share Tech Mono',monospace", fontSize:"12px", fontWeight:"700", letterSpacing:"1px" }}>${stop.line}</span>
         <span style=${{ flex:1, fontSize:"14px", fontWeight:"600", color:"#DEE6F5", fontFamily:"'Barlow Condensed',sans-serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>${stop.label}</span>
-        ${stop.hint && html`<span style=${{ fontSize:"13px", color:"#6B85A8", fontFamily:"'Barlow',sans-serif" }}>→ ${stop.hint}</span>`}
+        ${stop.hint && html`<span style=${{ fontSize:"15px", color:"#8BA4C4", fontFamily:"'Barlow',sans-serif" }}>${stop.hint}</span>`}
         ${state==="demo" && html`<span style=${{ background:"rgba(232,121,249,0.12)", color:"#E879F9", fontSize:"9px", padding:"2px 5px", borderRadius:"4px", letterSpacing:"1.5px" }}>DEMO</span>`}
       </div>
       ${state==="loading" ? html`
