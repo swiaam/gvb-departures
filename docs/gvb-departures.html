@@ -55,12 +55,14 @@ const STOPS = [
   { id:"f1a", label:"Veer Azartplein",      lineKey:"GVB_915_2", fromStop:"Azartplein",     line:"F1", towards:"Zamenhofstraat"},
   { id:"f1b", label:"Veer Zamenhofstraat",  lineKey:"GVB_915_1", fromStop:"Zamenhofstraat", line:"F1", towards:"Azartplein"    },
   { id:"f4",  label:"Veer NDSM",            lineKey:"GVB_906_1", fromStop:"NDSM",           line:"F4", towards:"Centraal"      },
-  { id:"f7",  label:"Veer NDSM (F7)",       lineKey:"GVB_903_2", fromStop:"NDSM",           line:"F7", towards:"Pontsteiger"   },
-  { id:"f6",  label:"Veer Distelweg",       lineKey:"GVB_900_1", fromStop:"Distelweg",      line:"F6", towards:"Pontsteiger"   },
+  { id:"f7",  label:"Veer NDSM (F7)",        lineKey:"GVB_903_2", fromStop:"NDSM",        line:"F7", towards:"Pontsteiger" },
+  { id:"f7r", label:"Veer Pontsteiger (F7)", lineKey:"GVB_903_1", fromStop:"Pontsteiger", line:"F7", towards:"NDSM"        },
+  { id:"f6",  label:"Veer Distelweg",        lineKey:"GVB_900_1", fromStop:"Distelweg",   line:"F6", towards:"Pontsteiger" },
+  { id:"f6r", label:"Veer Pontsteiger (F6)", lineKey:"GVB_900_2", fromStop:"Pontsteiger", line:"F6", towards:"Distelweg"   },
 ];
 
 const GROUPS = [
-  { id:"west",    label:"West",    stopIds:["f7","f6"]      },
+  { id:"west",    label:"West",    stopIds:["f7","f7r","f6","f6r"] },
   { id:"centrum", label:"Centrum", stopIds:["f2","f3","f4"] },
   { id:"oost",    label:"Oost",    stopIds:["f1a","f1b"]    },
 ];
