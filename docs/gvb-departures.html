@@ -9,26 +9,25 @@
   <title>GVB Veer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body { margin: 0; padding: 0; background: #060C18; overscroll-behavior: none; }
     input, select { -webkit-appearance: none; }
     input::placeholder { color: rgba(107,130,168,0.5); }
     input:focus, select:focus { border-color: rgba(255,112,67,0.4) !important; outline: none; }
-    /* Touch drag highlights via data attribute — no React re-render needed */
     [data-group-id][data-stop-over="true"]  { outline: 2px dashed rgba(99,179,237,0.6); border-radius: 16px; background: rgba(99,179,237,0.04); }
     [data-group-id][data-group-over="true"] { outline: 2px dashed rgba(255,112,67,0.6); border-radius: 16px; background: rgba(255,112,67,0.04); }
-    /* Drag ghost */
     .drag-ghost { position: fixed; pointer-events: none; z-index: 9999; opacity: 0.85; transform: scale(1.03) rotate(1deg); box-shadow: 0 12px 40px rgba(0,0,0,0.6); border-radius: 14px; transition: transform .1s; }
+    .drag-handle { touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; }
   </style>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useCallback, useRef } = React;
+<script type="module">
+import { h, render } from 'https://esm.sh/preact@10';
+import { useState, useEffect, useCallback, useRef } from 'https://esm.sh/preact@10/hooks';
+import htm from 'https://esm.sh/htm@3';
+const html = htm.bind(h);
 
 // ── API ───────────────────────────────────────────────────────────────────────
 async function fetchDepartures(lineKey) {
@@ -139,44 +138,45 @@ function StopCard({ stop, onRemove, onEdit, canRemove, onNextDep }) {
   const color = next ? urgencyColor(next.expected) : "#4A6280";
   const glow  = next ? urgencyGlow(next.expected)  : "transparent";
 
-  return (
+  return html`
     <div
       data-drag-type="stop"
-      data-drag-id={stop.id}
-      style={{ background:"rgba(255,255,255,0.035)", borderRadius:"14px", border:"1px solid rgba(255,255,255,0.07)", borderLeft:`4px solid ${color}`, padding:"12px 14px 10px", position:"relative", overflow:"hidden", transition:"border-color .5s", touchAction:"none" }}
+      data-drag-id=${stop.id}
+      style=${{ background:"rgba(255,255,255,0.035)", borderRadius:"14px", border:"1px solid rgba(255,255,255,0.07)", borderLeft:`4px solid ${color}`, padding:"12px 14px 10px", position:"relative", overflow:"hidden", transition:"border-color .5s" }}
     >
-      <div style={{ position:"absolute", top:"-40px", left:"-20px", width:"120px", height:"120px", borderRadius:"50%", background:`${color}10`, filter:"blur(30px)", pointerEvents:"none" }}/>
-      <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"8px" }}>
-        <span style={{ background:"#C8392B", color:"#fff", padding:"2px 7px", borderRadius:"5px", fontFamily:"'Share Tech Mono',monospace", fontSize:"12px", fontWeight:"700", letterSpacing:"1px" }}>{stop.line}</span>
-        <span style={{ flex:1, fontSize:"14px", fontWeight:"600", color:"#DEE6F5", fontFamily:"'Barlow Condensed',sans-serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{stop.label}</span>
-        {stop.towards && <span style={{ fontSize:"11px", color:"#4A6280", fontFamily:"'Barlow',sans-serif" }}>→ {stop.towards}</span>}
-        {state==="demo" && <span style={{ background:"rgba(232,121,249,0.12)", color:"#E879F9", fontSize:"9px", padding:"2px 5px", borderRadius:"4px", letterSpacing:"1.5px" }}>DEMO</span>}
-        <button onPointerDown={e => e.stopPropagation()} onClick={() => onEdit(stop)}
-          style={{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", cursor:"pointer", fontSize:"16px", lineHeight:1, padding:"4px 4px", minWidth:"32px", minHeight:"32px" }}>✏️</button>
-        {canRemove && <button onPointerDown={e => e.stopPropagation()} onClick={() => onRemove(stop.id)}
-          style={{ background:"none", border:"none", color:"rgba(255,255,255,0.2)", cursor:"pointer", fontSize:"20px", lineHeight:1, padding:"4px 4px", minWidth:"32px", minHeight:"32px" }}>×</button>}
+      <div style=${{ position:"absolute", top:"-40px", left:"-20px", width:"120px", height:"120px", borderRadius:"50%", background:`${color}10`, filter:"blur(30px)", pointerEvents:"none" }}/>
+      <div style=${{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"8px" }}>
+        <span class="drag-handle" data-drag-handle="stop" style=${{ color:"#3D5070", fontSize:"18px", lineHeight:1, padding:"4px 2px" }}>⠿</span>
+        <span style=${{ background:"#C8392B", color:"#fff", padding:"2px 7px", borderRadius:"5px", fontFamily:"'Share Tech Mono',monospace", fontSize:"12px", fontWeight:"700", letterSpacing:"1px" }}>${stop.line}</span>
+        <span style=${{ flex:1, fontSize:"14px", fontWeight:"600", color:"#DEE6F5", fontFamily:"'Barlow Condensed',sans-serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>${stop.label}</span>
+        ${stop.towards && html`<span style=${{ fontSize:"11px", color:"#4A6280", fontFamily:"'Barlow',sans-serif" }}>→ ${stop.towards}</span>`}
+        ${state==="demo" && html`<span style=${{ background:"rgba(232,121,249,0.12)", color:"#E879F9", fontSize:"9px", padding:"2px 5px", borderRadius:"4px", letterSpacing:"1.5px" }}>DEMO</span>`}
+        <button onPointerDown=${e => e.stopPropagation()} onClick=${() => onEdit(stop)}
+          style=${{ background:"none", border:"none", color:"rgba(255,255,255,0.3)", cursor:"pointer", fontSize:"16px", lineHeight:1, padding:"4px 4px", minWidth:"32px", minHeight:"32px" }}>✏️</button>
+        ${canRemove && html`<button onPointerDown=${e => e.stopPropagation()} onClick=${() => onRemove(stop.id)}
+          style=${{ background:"none", border:"none", color:"rgba(255,255,255,0.2)", cursor:"pointer", fontSize:"20px", lineHeight:1, padding:"4px 4px", minWidth:"32px", minHeight:"32px" }}>×</button>`}
       </div>
-      {state==="loading" ? (
-        <div style={{ color:"#263550", fontFamily:"'Barlow',sans-serif", padding:"4px 0" }}>Fetching…</div>
-      ) : state==="empty" ? (
-        <div style={{ color:"#4A6280", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"4px 0" }}>No upcoming departures</div>
-      ) : next ? (
+      ${state==="loading" ? html`
+        <div style=${{ color:"#263550", fontFamily:"'Barlow',sans-serif", padding:"4px 0" }}>Fetching…</div>
+      ` : state==="empty" ? html`
+        <div style=${{ color:"#4A6280", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"4px 0" }}>No upcoming departures</div>
+      ` : next ? html`
         <>
-          <div style={{ display:"flex", alignItems:"flex-end", gap:"10px", marginBottom:"6px" }}>
-            <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:"46px", lineHeight:1, letterSpacing:"-1px", color, textShadow:`0 0 20px ${glow}`, transition:"color .5s" }}>{fmtCountdown(next.expected)}</span>
-            <span style={{ fontSize:"11px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ {next.destination||stop.towards}</span>
+          <div style=${{ display:"flex", alignItems:"flex-end", gap:"10px", marginBottom:"6px" }}>
+            <span style=${{ fontFamily:"'Share Tech Mono',monospace", fontSize:"46px", lineHeight:1, letterSpacing:"-1px", color, textShadow:`0 0 20px ${glow}`, transition:"color .5s" }}>${fmtCountdown(next.expected)}</span>
+            <span style=${{ fontSize:"11px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ ${next.destination||stop.towards}</span>
           </div>
-          {deps.slice(1).length > 0 && (
-            <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:"6px", display:"flex", gap:"12px" }}>
-              {deps.slice(1).map((d,i) => (
-                <div key={i} style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:"15px", color:urgencyColor(d.expected), transition:"color .5s" }}>{fmtClock(d.expected)}</div>
-              ))}
+          ${deps.slice(1).length > 0 && html`
+            <div style=${{ borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:"6px", display:"flex", gap:"12px" }}>
+              ${deps.slice(1).map((d,i) => html`
+                <div key=${i} style=${{ fontFamily:"'Share Tech Mono',monospace", fontSize:"15px", color:urgencyColor(d.expected), transition:"color .5s" }}>${fmtClock(d.expected)}</div>
+              `)}
             </div>
-          )}
+          `}
         </>
-      ) : null}
+      ` : null}
     </div>
-  );
+  `;
 }
 
 // ── GroupSection ──────────────────────────────────────────────────────────────
@@ -192,28 +192,27 @@ function GroupSection({ group, stops, nextDeps, onRemoveStop, onEditStop, onNext
       return ta - tb;
     });
 
-  return (
-    <div data-group-id={group.id} style={{ borderRadius:"16px", padding:"8px 8px 10px", border:"1px solid transparent", transition:"background .15s, outline .15s" }}>
-      {/* Header — touch drag handle for group reorder */}
-      <div data-drag-type="group" style={{ display:"flex", alignItems:"center", gap:"8px", padding:"2px 0 8px", cursor:"grab", touchAction:"none" }}>
-        <span style={{ color:"#3D5070", fontSize:"18px", lineHeight:1 }}>⠿</span>
-        <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:"700", fontSize:"13px", letterSpacing:"2.5px", color:"#4A6280", textTransform:"uppercase" }}>{group.label}</span>
-        <div style={{ flex:1, height:"1px", background:"rgba(255,255,255,0.06)" }}/>
+  return html`
+    <div data-group-id=${group.id} style=${{ borderRadius:"16px", padding:"8px 8px 10px", border:"1px solid transparent", transition:"background .15s, outline .15s" }}>
+      <div data-drag-type="group" class="drag-handle" style=${{ display:"flex", alignItems:"center", gap:"8px", padding:"2px 0 8px" }}>
+        <span style=${{ color:"#3D5070", fontSize:"18px", lineHeight:1 }}>⠿</span>
+        <span style=${{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:"700", fontSize:"13px", letterSpacing:"2.5px", color:"#4A6280", textTransform:"uppercase" }}>${group.label}</span>
+        <div style=${{ flex:1, height:"1px", background:"rgba(255,255,255,0.06)" }}/>
       </div>
-      <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
-        {groupStops.map(s => (
-          <StopCard key={s.id} stop={s}
-            onRemove={onRemoveStop}
-            onEdit={onEditStop}
-            canRemove={canRemove}
-            onNextDep={onNextDep} />
-        ))}
-        {groupStops.length === 0 && (
-          <div style={{ color:"#263550", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"8px 4px", textAlign:"center" }}>Drop a stop here</div>
-        )}
+      <div style=${{ display:"flex", flexDirection:"column", gap:"8px" }}>
+        ${groupStops.map(s => html`
+          <${StopCard} key=${s.id} stop=${s}
+            onRemove=${onRemoveStop}
+            onEdit=${onEditStop}
+            canRemove=${canRemove}
+            onNextDep=${onNextDep} />
+        `)}
+        ${groupStops.length === 0 && html`
+          <div style=${{ color:"#263550", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"8px 4px", textAlign:"center" }}>Drop a stop here</div>
+        `}
       </div>
     </div>
-  );
+  `;
 }
 
 // ── StopModal ─────────────────────────────────────────────────────────────────
@@ -223,35 +222,35 @@ function StopModal({ initial, groups, onSave, onClose }) {
   const upd = k => e => setF(p => ({...p, [k]: e.target.value}));
   const ok = f.label && f.lineKey && f.line;
   const inp = { background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:"10px", color:"#DEE6F5", padding:"12px 14px", width:"100%", fontFamily:"'Barlow',sans-serif", fontSize:"16px", boxSizing:"border-box" };
-  return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,.75)", display:"flex", alignItems:"flex-end", zIndex:100 }} onClick={onClose}>
-      <div style={{ background:"#0D1525", borderRadius:"20px 20px 0 0", padding:"22px 18px 48px", width:"100%", maxWidth:"480px", margin:"0 auto", border:"1px solid rgba(255,255,255,0.08)", borderBottom:"none" }} onClick={e=>e.stopPropagation()}>
-        <h3 style={{ margin:"0 0 14px", color:"#DEE6F5", fontFamily:"'Barlow Condensed',sans-serif", fontSize:"20px", fontWeight:"700" }}>{isEdit?"Edit stop":"Add a stop"}</h3>
-        <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
-          <input style={inp} placeholder="Stop name (e.g. Veer NDSM)" value={f.label} onChange={upd("label")} />
-          <div style={{ display:"flex", gap:"8px" }}>
-            <input style={{...inp, flex:2}} placeholder="Line key (e.g. GVB_903_2)" value={f.lineKey} onChange={upd("lineKey")} />
-            <input style={{...inp, flex:1}} placeholder="Line (e.g. F7)" value={f.line} onChange={upd("line")} />
+  return html`
+    <div style=${{ position:"fixed", inset:0, background:"rgba(0,0,0,.75)", display:"flex", alignItems:"flex-end", zIndex:100 }} onClick=${onClose}>
+      <div style=${{ background:"#0D1525", borderRadius:"20px 20px 0 0", padding:"22px 18px 48px", width:"100%", maxWidth:"480px", margin:"0 auto", border:"1px solid rgba(255,255,255,0.08)", borderBottom:"none" }} onClick=${e=>e.stopPropagation()}>
+        <h3 style=${{ margin:"0 0 14px", color:"#DEE6F5", fontFamily:"'Barlow Condensed',sans-serif", fontSize:"20px", fontWeight:"700" }}>${isEdit?"Edit stop":"Add a stop"}</h3>
+        <div style=${{ display:"flex", flexDirection:"column", gap:"10px" }}>
+          <input style=${inp} placeholder="Stop name (e.g. Veer NDSM)" value=${f.label} onInput=${upd("label")} />
+          <div style=${{ display:"flex", gap:"8px" }}>
+            <input style=${{...inp, flex:2}} placeholder="Line key (e.g. GVB_903_2)" value=${f.lineKey} onInput=${upd("lineKey")} />
+            <input style=${{...inp, flex:1}} placeholder="Line (e.g. F7)" value=${f.line} onInput=${upd("line")} />
           </div>
-          <div style={{ display:"flex", gap:"8px" }}>
-            <input style={{...inp, flex:1}} placeholder="From stop" value={f.fromStop} onChange={upd("fromStop")} />
-            <input style={{...inp, flex:1}} placeholder="Towards" value={f.towards} onChange={upd("towards")} />
+          <div style=${{ display:"flex", gap:"8px" }}>
+            <input style=${{...inp, flex:1}} placeholder="From stop" value=${f.fromStop} onInput=${upd("fromStop")} />
+            <input style=${{...inp, flex:1}} placeholder="Towards" value=${f.towards} onInput=${upd("towards")} />
           </div>
-          <select style={{...inp, color: f.groupId ? "#DEE6F5" : "rgba(107,130,168,0.5)"}} value={f.groupId||""} onChange={upd("groupId")}>
+          <select style=${{...inp, color: f.groupId ? "#DEE6F5" : "rgba(107,130,168,0.5)"}} value=${f.groupId||""} onChange=${upd("groupId")}>
             <option value="">No group</option>
-            {groups.map(g => <option key={g.id} value={g.id}>{g.label}</option>)}
+            ${groups.map(g => html`<option key=${g.id} value=${g.id}>${g.label}</option>`)}
           </select>
-          <div style={{ display:"flex", gap:"10px", marginTop:"4px" }}>
-            <button onClick={onClose} style={{ flex:1, background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:"12px", color:"#6B82A8", fontFamily:"'Barlow Condensed',sans-serif", fontSize:"17px", fontWeight:"600", padding:"14px", cursor:"pointer" }}>Cancel</button>
-            <button disabled={!ok} onClick={() => { onSave({...f, id:initial?.id||`s${Date.now()}`}); onClose(); }}
-              style={{ flex:2, background:ok?"#C8392B":"rgba(200,57,43,.2)", border:"none", borderRadius:"12px", color:ok?"#fff":"#5A3030", fontFamily:"'Barlow Condensed',sans-serif", fontSize:"17px", fontWeight:"700", padding:"14px", cursor:ok?"pointer":"default", transition:"all .2s" }}>
-              {isEdit?"Save":"Add Stop"}
+          <div style=${{ display:"flex", gap:"10px", marginTop:"4px" }}>
+            <button onClick=${onClose} style=${{ flex:1, background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:"12px", color:"#6B82A8", fontFamily:"'Barlow Condensed',sans-serif", fontSize:"17px", fontWeight:"600", padding:"14px", cursor:"pointer" }}>Cancel</button>
+            <button disabled=${!ok} onClick=${() => { onSave({...f, id:initial?.id||`s${Date.now()}`}); onClose(); }}
+              style=${{ flex:2, background:ok?"#C8392B":"rgba(200,57,43,.2)", border:"none", borderRadius:"12px", color:ok?"#fff":"#5A3030", fontFamily:"'Barlow Condensed',sans-serif", fontSize:"17px", fontWeight:"700", padding:"14px", cursor:ok?"pointer":"default", transition:"all .2s" }}>
+              ${isEdit?"Save":"Add Stop"}
             </button>
           </div>
         </div>
       </div>
     </div>
-  );
+  `;
 }
 
 // ── App ───────────────────────────────────────────────────────────────────────
@@ -284,7 +283,7 @@ function App() {
     setGroups(prev => prev.map(g => ({ ...g, stopIds: g.stopIds.filter(sid => sid !== id) })));
   };
 
-  // ── Touch drag-and-drop (works on iOS Safari) ─────────────────────────────
+  // ── Touch drag-and-drop ───────────────────────────────────────────────────
   useEffect(() => {
     const THRESHOLD = 8;
     let pending = null;
@@ -297,14 +296,12 @@ function App() {
       if (ghost) ghost.style.visibility = '';
       return getGroupEl(el)?.dataset.groupId || null;
     }
-
     function clearHighlights() {
       document.querySelectorAll('[data-group-id]').forEach(el => {
         el.removeAttribute('data-stop-over');
         el.removeAttribute('data-group-over');
       });
     }
-
     function setHighlight(groupId, type) {
       clearHighlights();
       if (!groupId) return;
@@ -313,16 +310,18 @@ function App() {
     }
 
     function onTouchStart(e) {
-      const stopEl  = e.target.closest('[data-drag-type="stop"]');
-      const groupEl = e.target.closest('[data-drag-type="group"]');
-      if (!stopEl && !groupEl) return;
+      // Only initiate drag from dedicated handles
+      const stopHandle  = e.target.closest('[data-drag-handle="stop"]');
+      const groupHandle = e.target.closest('[data-drag-type="group"]');
+      if (!stopHandle && !groupHandle) return;
 
       const touch = e.touches[0];
-      if (stopEl) {
+      if (stopHandle) {
+        const stopEl    = stopHandle.closest('[data-drag-type="stop"]');
         const fromGroup = getGroupEl(stopEl)?.dataset.groupId;
         pending = { type:'stop', id:stopEl.dataset.dragId, fromGroup, el:stopEl, startX:touch.clientX, startY:touch.clientY };
       } else {
-        const container = getGroupEl(groupEl);
+        const container = getGroupEl(groupHandle);
         pending = { type:'group', id:container?.dataset.groupId, fromGroup:null, el:container, startX:touch.clientX, startY:touch.clientY };
       }
     }
@@ -342,15 +341,14 @@ function App() {
         const dy = touch.clientY - pending.startY;
         if (Math.sqrt(dx*dx + dy*dy) < THRESHOLD) return;
         e.preventDefault();
-        // Create ghost
-        const rect = pending.el.getBoundingClientRect();
+        const rect  = pending.el.getBoundingClientRect();
         const ghost = pending.el.cloneNode(true);
         ghost.className = 'drag-ghost';
         ghost.style.left  = `${rect.left}px`;
         ghost.style.top   = `${rect.top}px`;
         ghost.style.width = `${rect.width}px`;
         document.body.appendChild(ghost);
-        active = { ...pending, ghost, offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top, hoveredGroup: pending.fromGroup };
+        active  = { ...pending, ghost, offsetX: touch.clientX - rect.left, offsetY: touch.clientY - rect.top, hoveredGroup: pending.fromGroup };
         pending = null;
       }
     }
@@ -394,10 +392,9 @@ function App() {
     };
   }, []);
 
-  // HTML5 drag (desktop fallback)
+  // ── Desktop drag ──────────────────────────────────────────────────────────
   const desktopDrag = useRef(null);
   const [desktopOver, setDesktopOver] = useState(null);
-
   const stopGroupId = (stopId) => groups.find(g => g.stopIds.includes(stopId))?.id;
 
   function handleDesktopDrop(targetGroupId) {
@@ -423,87 +420,70 @@ function App() {
     setDesktopOver(null);
   }
 
-  return (
-    <div style={{ minHeight:"100vh", background:"linear-gradient(160deg,#060C18 0%,#091020 60%,#060C18 100%)", fontFamily:"'Barlow Condensed','Barlow',sans-serif", color:"#DEE6F5", maxWidth:"480px", margin:"0 auto", paddingTop:"env(safe-area-inset-top)", paddingBottom:"env(safe-area-inset-bottom)" }}>
-      <div style={{ background:"linear-gradient(135deg,#111E60 0%,#182888 100%)", padding:"26px 18px 20px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:"700", fontSize:"28px", color:"#FF7043", letterSpacing:"3px" }}>≈≈ GVB</div>
-        <div style={{ color:"#4A6080", fontSize:"12px", fontFamily:"'Barlow',sans-serif", marginTop:"2px", letterSpacing:"2px" }}>MY DEPARTURES</div>
+  return html`
+    <div style=${{ minHeight:"100vh", background:"linear-gradient(160deg,#060C18 0%,#091020 60%,#060C18 100%)", fontFamily:"'Barlow Condensed','Barlow',sans-serif", color:"#DEE6F5", maxWidth:"480px", margin:"0 auto", paddingTop:"env(safe-area-inset-top)", paddingBottom:"env(safe-area-inset-bottom)" }}>
+      <div style=${{ background:"linear-gradient(135deg,#111E60 0%,#182888 100%)", padding:"26px 18px 20px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+        <div style=${{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:"700", fontSize:"28px", color:"#FF7043", letterSpacing:"3px" }}>≈≈ GVB</div>
+        <div style=${{ color:"#4A6080", fontSize:"12px", fontFamily:"'Barlow',sans-serif", marginTop:"2px", letterSpacing:"2px" }}>MY DEPARTURES</div>
       </div>
 
-      <div style={{ padding:"14px", display:"flex", flexDirection:"column", gap:"14px" }}>
-        {groups.map(group => {
+      <div style=${{ padding:"14px", display:"flex", flexDirection:"column", gap:"14px" }}>
+        ${groups.map(group => {
           const isStopOver  = desktopOver?.groupId === group.id && desktopOver?.type === 'stop';
           const isGroupOver = desktopOver?.groupId === group.id && desktopOver?.type === 'group';
-          return (
-            <div key={group.id}
-              onDragOver={e => { e.preventDefault(); setDesktopOver({ groupId:group.id, type:desktopDrag.current?.type }); }}
-              onDrop={e => { e.preventDefault(); handleDesktopDrop(group.id); }}
-              style={{ outline: isStopOver ? "2px dashed rgba(99,179,237,0.6)" : isGroupOver ? "2px dashed rgba(255,112,67,0.6)" : "2px solid transparent", borderRadius:"16px", transition:"outline .15s" }}
+          return html`
+            <div key=${group.id}
+              onDragOver=${e => { e.preventDefault(); setDesktopOver({ groupId:group.id, type:desktopDrag.current?.type }); }}
+              onDrop=${e => { e.preventDefault(); handleDesktopDrop(group.id); }}
+              style=${{ outline: isStopOver ? "2px dashed rgba(99,179,237,0.6)" : isGroupOver ? "2px dashed rgba(255,112,67,0.6)" : "2px solid transparent", borderRadius:"16px", transition:"outline .15s" }}
             >
-              <GroupSection
-                group={group}
-                stops={stops}
-                nextDeps={nextDeps}
-                onRemoveStop={handleRemoveStop}
-                onEditStop={stop => setModal({ mode:"edit", stop })}
-                onNextDep={handleNextDep}
-                canRemove={stops.length > 1}
+              <${GroupSection}
+                group=${group}
+                stops=${stops}
+                nextDeps=${nextDeps}
+                onRemoveStop=${handleRemoveStop}
+                onEditStop=${stop => setModal({ mode:"edit", stop })}
+                onNextDep=${handleNextDep}
+                canRemove=${stops.length > 1}
               />
-              {/* Desktop drag bindings on stop cards via event delegation */}
             </div>
-          );
+          `;
         })}
       </div>
 
-      {/* Desktop drag on stop cards / group headers via capture */}
-      <div style={{ display:"none" }} onDragStart={e => {
-        const stopEl  = e.target.closest('[data-drag-type="stop"]');
-        const groupEl = e.target.closest('[data-drag-type="group"]');
-        if (stopEl)  desktopDrag.current = { type:'stop',  id:stopEl.dataset.dragId, fromGroup: stopGroupId(stopEl.dataset.dragId) };
-        if (groupEl) desktopDrag.current = { type:'group', id:groupEl.closest('[data-group-id]')?.dataset.groupId };
+      <div style=${{ display:"none" }} onDragStart=${e => {
+        const stopHandle  = e.target.closest('[data-drag-handle="stop"]');
+        const groupHandle = e.target.closest('[data-drag-type="group"]');
+        if (stopHandle) {
+          const stopEl = stopHandle.closest('[data-drag-type="stop"]');
+          desktopDrag.current = { type:'stop', id:stopEl.dataset.dragId, fromGroup: stopGroupId(stopEl.dataset.dragId) };
+        }
+        if (groupHandle) desktopDrag.current = { type:'group', id:groupHandle.closest('[data-group-id]')?.dataset.groupId };
       }}/>
 
-      <div style={{ padding:"0 14px 8px" }}>
-        <button onClick={() => setModal({ mode:"add" })}
-          style={{ display:"block", width:"100%", background:"rgba(255,112,67,.07)", border:"1px dashed rgba(255,112,67,.3)", borderRadius:"14px", color:"rgba(255,112,67,.8)", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:"700", fontSize:"17px", letterSpacing:"1.5px", padding:"16px", cursor:"pointer" }}>
+      <div style=${{ padding:"0 14px 8px" }}>
+        <button onClick=${() => setModal({ mode:"add" })}
+          style=${{ display:"block", width:"100%", background:"rgba(255,112,67,.07)", border:"1px dashed rgba(255,112,67,.3)", borderRadius:"14px", color:"rgba(255,112,67,.8)", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:"700", fontSize:"17px", letterSpacing:"1.5px", padding:"16px", cursor:"pointer" }}>
           + ADD STOP
         </button>
       </div>
 
-      <div style={{ padding:"12px 18px 30px", color:"#1E3050", fontSize:"11px", fontFamily:"'Barlow',sans-serif", borderTop:"1px solid rgba(255,255,255,0.03)", marginTop:"6px" }}>
+      <div style=${{ padding:"12px 18px 30px", color:"#1E3050", fontSize:"11px", fontFamily:"'Barlow',sans-serif", borderTop:"1px solid rgba(255,255,255,0.03)", marginTop:"6px" }}>
         Live data via OVapi · auto-refreshes every 30s
       </div>
 
-      {modal && (
-        <StopModal
-          initial={modal.mode==="edit" ? modal.stop : null}
-          groups={groups}
-          onSave={handleSave}
-          onClose={() => setModal(null)} />
-      )}
+      ${modal && html`
+        <${StopModal}
+          initial=${modal.mode==="edit" ? modal.stop : null}
+          groups=${groups}
+          onSave=${handleSave}
+          onClose=${() => setModal(null)} />
+      `}
     </div>
-  );
+  `;
 }
 
-// ── Desktop drag wiring (event delegation on document) ────────────────────────
-// We attach draggable via React ref on the wrapper
-function AppWrapper() {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    function setDraggable(e) {
-      const stopEl  = e.target.closest('[data-drag-type="stop"]');
-      const groupEl = e.target.closest('[data-drag-type="group"]');
-      if (stopEl)  stopEl.closest('[data-drag-type="stop"]').setAttribute('draggable','true');
-      if (groupEl) groupEl.closest('[data-group-id]').setAttribute('draggable','true');
-    }
-    ref.current.addEventListener('mousedown', setDraggable);
-    return () => ref.current?.removeEventListener('mousedown', setDraggable);
-  }, []);
-  return <div ref={ref}><App /></div>;
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(<AppWrapper />);
+render(h(App, null), document.getElementById('root'));
 </script>
 </body>
 </html>
