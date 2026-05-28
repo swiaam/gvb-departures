@@ -24,7 +24,7 @@
 <body>
 <div id="root"></div>
 <script type="module">
-import { h, render } from 'https://esm.sh/preact@10';
+import { h, render, Fragment } from 'https://esm.sh/preact@10';
 import { useState, useEffect, useCallback, useRef } from 'https://esm.sh/preact@10/hooks';
 import htm from 'https://esm.sh/htm@3';
 const html = htm.bind(h);
@@ -39,7 +39,9 @@ async function fetchDepartures(lineKey) {
   let json = null;
   for (const src of sources) {
     try {
-      const r = await fetch(src, { signal: AbortSignal.timeout(7000) });
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 7000);
+      const r = await fetch(src, { signal: ctrl.signal }).finally(() => clearTimeout(tid));
       if (!r.ok) continue;
       json = await r.json();
       break;
@@ -161,7 +163,7 @@ function StopCard({ stop, onRemove, onEdit, canRemove, onNextDep }) {
       ` : state==="empty" ? html`
         <div style=${{ color:"#4A6280", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"4px 0" }}>No upcoming departures</div>
       ` : next ? html`
-        <>
+        <${Fragment}>
           <div style=${{ display:"flex", alignItems:"flex-end", gap:"10px", marginBottom:"6px" }}>
             <span style=${{ fontFamily:"'Share Tech Mono',monospace", fontSize:"46px", lineHeight:1, letterSpacing:"-1px", color, textShadow:`0 0 20px ${glow}`, transition:"color .5s" }}>${fmtCountdown(next.expected)}</span>
             <span style=${{ fontSize:"11px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ ${next.destination||stop.towards}</span>
@@ -173,7 +175,7 @@ function StopCard({ stop, onRemove, onEdit, canRemove, onNextDep }) {
               `)}
             </div>
           `}
-        </>
+        </${Fragment}>
       ` : null}
     </div>
   `;
