@@ -55,8 +55,8 @@ const STOPS = [
   { id:"f1a", label:"Veer Azartplein",      lineKey:"GVB_915_2", fromStop:"Azartplein",     line:"F1", hint:"KNSM-eiland to Noord"},
   { id:"f1b", label:"Veer Zamenhofstraat",  lineKey:"GVB_915_1", fromStop:"Zamenhofstraat", line:"F1", hint:"Noord to KNSM-eiland"    },
   { id:"f4",  label:"Veer NDSM",            lineKey:"GVB_906_1", fromStop:"NDSM",           line:"F4", hint:"NDSM to Centraal"      },
-  { id:"f7",  label:"Veer NDSM (F7)",        lineKey:"GVB_903_2", fromStop:"NDSM",        line:"F7", hint:"NDSM to Pontsteiger" },
-  { id:"f7r", label:"Veer Pontsteiger (F7)", lineKey:"GVB_903_1", fromStop:"Pontsteiger", line:"F7", hint:"Pontsteiger to NDSM"        },
+  { id:"f7",  label:"Veer NDSM (F7)",        lineKey:"GVB_903_2", fromStop:"NDSM",        line:"F7", hint:"NDSM to West" },
+  { id:"f7r", label:"Veer Pontsteiger (F7)", lineKey:"GVB_903_1", fromStop:"Pontsteiger", line:"F7", hint:"West to NDSM"        },
   { id:"f6",  label:"Veer Distelweg",        lineKey:"GVB_900_1", fromStop:"Distelweg",   line:"F6", hint:"Noord to West" },
   { id:"f6r", label:"Veer Pontsteiger (F6)", lineKey:"GVB_900_2", fromStop:"Pontsteiger", line:"F6", hint:"West to Noord"   },
 ];
@@ -93,7 +93,7 @@ function urgencyGlow(dt) {
 }
 
 // ── StopCard ──────────────────────────────────────────────────────────────────
-function StopCard({ stop }) {
+function StopCard({ stop, onNextDep }) {
   const [deps,  setDeps]  = useState([]);
   const [state, setState] = useState("loading");
   const [,      tick]     = useState(0);
@@ -105,15 +105,18 @@ function StopCard({ stop }) {
       const slice = all.slice(0, 4);
       setDeps(slice);
       setState(slice.length > 0 ? "live" : "empty");
+      onNextDep(stop.id, slice[0]?.expected ?? null);
     } catch {
       if (deps.length === 0) {
         const now = Date.now();
-        setDeps([
+        const demo = [
           { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+6*60000+22000) },
           { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+26*60000+22000) },
           { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+46*60000+22000) },
-        ]);
+        ];
+        setDeps(demo);
         setState("demo");
+        onNextDep(stop.id, demo[0].expected);
       }
     }
   }, [stop, deps.length]);
@@ -159,6 +162,9 @@ function StopCard({ stop }) {
 
 // ── App ───────────────────────────────────────────────────────────────────────
 function App() {
+  const [nextDeps, setNextDeps] = useState({});
+  const onNextDep = useCallback((id, time) => setNextDeps(prev => ({ ...prev, [id]: time })), []);
+
   return html`
     <div style=${{ minHeight:"100vh", background:"linear-gradient(160deg,#060C18 0%,#091020 60%,#060C18 100%)", fontFamily:"'Barlow Condensed','Barlow',sans-serif", color:"#DEE6F5", maxWidth:"480px", margin:"0 auto", paddingTop:"env(safe-area-inset-top)", paddingBottom:"env(safe-area-inset-bottom)" }}>
       <div style=${{ background:"linear-gradient(135deg,#111E60 0%,#182888 100%)", padding:"26px 18px 20px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
@@ -174,8 +180,16 @@ function App() {
               <div style=${{ flex:1, height:"1px", background:"rgba(255,255,255,0.06)" }}/>
             </div>
             <div style=${{ display:"flex", flexDirection:"column", gap:"8px" }}>
-              ${group.stopIds.map(id => STOPS.find(s => s.id === id)).filter(Boolean).map(s => html`
-                <${StopCard} key=${s.id} stop=${s} />
+              ${group.stopIds.map(id => STOPS.find(s => s.id === id)).filter(Boolean)
+                .sort((a, b) => {
+                  const ta = nextDeps[a.id], tb = nextDeps[b.id];
+                  if (!ta && !tb) return 0;
+                  if (!ta) return 1;
+                  if (!tb) return -1;
+                  return ta - tb;
+                })
+                .map(s => html`
+                <${StopCard} key=${s.id} stop=${s} onNextDep=${onNextDep} />
               `)}
             </div>
           </div>
