@@ -145,7 +145,7 @@ function StopCard({ stop, onNextDep }) {
         <${Fragment}>
           <div style=${{ display:"flex", alignItems:"flex-end", gap:"10px", marginBottom:"6px" }}>
             <span style=${{ fontFamily:"'Share Tech Mono',monospace", fontSize:"46px", lineHeight:1, letterSpacing:"-1px", color, textShadow:`0 0 20px ${glow}`, transition:"color .5s" }}>${fmtCountdown(next.expected)}</span>
-            <span style=${{ fontSize:"11px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ ${next.destination||stop.hint}</span>
+            <span style=${{ fontSize:"13px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ ${next.destination||stop.hint}</span>
           </div>
           ${deps.slice(1).length > 0 && html`
             <div style=${{ borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:"6px", display:"flex", gap:"12px" }}>
