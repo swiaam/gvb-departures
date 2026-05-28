@@ -1,2 +1,2 @@
 # gvb-departures
-Favorate GVB departurnes in NL
+Favorite GVB departurnes in NL
