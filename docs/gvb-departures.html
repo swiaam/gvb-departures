@@ -50,15 +50,15 @@ async function fetchDepartures(lineKey) {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const STOPS = [
-  { id:"f3",  label:"Veer Buiksloterweg",  lineKey:"GVB_901_1", fromStop:"Buiksloterweg", line:"F3", hint:"Centraal"      },
-  { id:"f2",  label:"Veer IJplein",         lineKey:"GVB_902_1", fromStop:"IJplein",        line:"F2", hint:"Centraal"      },
-  { id:"f1a", label:"Veer Azartplein",      lineKey:"GVB_915_2", fromStop:"Azartplein",     line:"F1", hint:"Zamenhofstraat"},
-  { id:"f1b", label:"Veer Zamenhofstraat",  lineKey:"GVB_915_1", fromStop:"Zamenhofstraat", line:"F1", hint:"Azartplein"    },
-  { id:"f4",  label:"Veer NDSM",            lineKey:"GVB_906_1", fromStop:"NDSM",           line:"F4", hint:"Centraal"      },
-  { id:"f7",  label:"Veer NDSM (F7)",        lineKey:"GVB_903_2", fromStop:"NDSM",        line:"F7", hint:"Pontsteiger" },
-  { id:"f7r", label:"Veer Pontsteiger (F7)", lineKey:"GVB_903_1", fromStop:"Pontsteiger", line:"F7", hint:"NDSM"        },
-  { id:"f6",  label:"Veer Distelweg",        lineKey:"GVB_900_1", fromStop:"Distelweg",   line:"F6", hint:"Pontsteiger" },
-  { id:"f6r", label:"Veer Pontsteiger (F6)", lineKey:"GVB_900_2", fromStop:"Pontsteiger", line:"F6", hint:"Distelweg"   },
+  { id:"f3",  label:"Veer Buiksloterweg",  lineKey:"GVB_901_1", fromStop:"Buiksloterweg", line:"F3", hint:"A'dam Tower"      },
+  { id:"f2",  label:"Veer IJplein",         lineKey:"GVB_902_1", fromStop:"IJplein",        line:"F2", hint:"IJplein to Centraal"      },
+  { id:"f1a", label:"Veer Azartplein",      lineKey:"GVB_915_2", fromStop:"Azartplein",     line:"F1", hint:"KNSM-eiland to Noord"},
+  { id:"f1b", label:"Veer Zamenhofstraat",  lineKey:"GVB_915_1", fromStop:"Zamenhofstraat", line:"F1", hint:"Noord to KNSM-eiland"    },
+  { id:"f4",  label:"Veer NDSM",            lineKey:"GVB_906_1", fromStop:"NDSM",           line:"F4", hint:"NDSM to Centraal"      },
+  { id:"f7",  label:"Veer NDSM (F7)",        lineKey:"GVB_903_2", fromStop:"NDSM",        line:"F7", hint:"NDSM to Pontsteiger" },
+  { id:"f7r", label:"Veer Pontsteiger (F7)", lineKey:"GVB_903_1", fromStop:"Pontsteiger", line:"F7", hint:"Pontsteiger to NDSM"        },
+  { id:"f6",  label:"Veer Distelweg",        lineKey:"GVB_900_1", fromStop:"Distelweg",   line:"F6", hint:"Noord to West" },
+  { id:"f6r", label:"Veer Pontsteiger (F6)", lineKey:"GVB_900_2", fromStop:"Pontsteiger", line:"F6", hint:"West to Noord"   },
 ];
 
 const GROUPS = [
