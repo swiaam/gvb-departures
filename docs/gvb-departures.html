@@ -24,12 +24,11 @@ const html = htm.bind(h);
 
 // ── API ───────────────────────────────────────────────────────────────────────
 async function fetchDepartures(lineKey) {
-  const target = encodeURIComponent(`http://v0.ovapi.nl/line/${lineKey}`);
   const ctrl = new AbortController();
   const tid = setTimeout(() => ctrl.abort(), 7000);
   let json = null;
   try {
-    const r = await fetch(`https://api.codetabs.com/v1/proxy?quest=${target}`, { signal: ctrl.signal });
+    const r = await fetch(`https://europe-west4-ws-mygvb-departures.cloudfunctions.net/ovapi-proxy?line=${lineKey}`, { signal: ctrl.signal });
     if (r.ok) json = await r.json();
   } finally {
     clearTimeout(tid);
