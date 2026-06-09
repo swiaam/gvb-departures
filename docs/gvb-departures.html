@@ -105,18 +105,10 @@ function StopCard({ stop, onNextDep }) {
       setDeps(slice);
       setState(slice.length > 0 ? "live" : "empty");
       onNextDep(stop.id, slice[0]?.expected ?? null);
-    } catch {
-      if (deps.length === 0) {
-        const now = Date.now();
-        const demo = [
-          { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+6*60000+22000) },
-          { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+26*60000+22000) },
-          { destination:stop.hint, stopName:stop.fromStop, expected:new Date(now+46*60000+22000) },
-        ];
-        setDeps(demo);
-        setState("demo");
-        onNextDep(stop.id, demo[0].expected);
-      }
+    } catch(e) {
+      setDeps([]);
+      setState("error:" + (e?.message || "unknown"));
+      onNextDep(stop.id, null);
     }
   }, [stop, deps.length]);
 
@@ -134,12 +126,14 @@ function StopCard({ stop, onNextDep }) {
         <span style=${{ background:"#C8392B", color:"#fff", padding:"2px 7px", borderRadius:"5px", fontFamily:"'Share Tech Mono',monospace", fontSize:"12px", fontWeight:"700", letterSpacing:"1px" }}>${stop.line}</span>
         <span style=${{ flex:1, fontSize:"14px", fontWeight:"600", color:"#DEE6F5", fontFamily:"'Barlow Condensed',sans-serif", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>${stop.label}</span>
         ${stop.hint && html`<span style=${{ fontSize:"15px", color:"#8BA4C4", fontFamily:"'Barlow',sans-serif" }}>${stop.hint}</span>`}
-        ${state==="demo" && html`<span style=${{ background:"rgba(232,121,249,0.12)", color:"#E879F9", fontSize:"9px", padding:"2px 5px", borderRadius:"4px", letterSpacing:"1.5px" }}>DEMO</span>`}
+
       </div>
       ${state==="loading" ? html`
         <div style=${{ color:"#263550", fontFamily:"'Barlow',sans-serif", padding:"4px 0" }}>Fetching…</div>
       ` : state==="empty" ? html`
         <div style=${{ color:"#4A6280", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"4px 0" }}>No upcoming departures</div>
+      ` : state.startsWith("error:") ? html`
+        <div style=${{ color:"#4A6280", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"4px 0" }}>N/A — ${state.slice(6)}</div>
       ` : next ? html`
         <${Fragment}>
           <div style=${{ display:"flex", alignItems:"flex-end", gap:"10px", marginBottom:"6px" }}>
