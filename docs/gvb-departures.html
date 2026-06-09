@@ -198,6 +198,17 @@ function App() {
 }
 
 render(h(App, null), document.getElementById('root'));
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/gvb-departures/sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const sw = reg.installing;
+      sw.addEventListener('statechange', () => {
+        if (sw.state === 'activated') window.location.reload();
+      });
+    });
+  });
+}
 </script>
 </body>
 </html>
