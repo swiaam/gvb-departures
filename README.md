@@ -1,6 +1,6 @@
 # My GVB
 
-A personal departure board for GVB ferry lines in Amsterdam, optimised for mobile use.
+A personal departure board for GVB ferry lines in Amsterdam, optimised for mobile use as a PWA.
 
 Live at: **https://swiaam.github.io/gvb-departures/gvb-departures.html**
 
@@ -8,10 +8,10 @@ Live at: **https://swiaam.github.io/gvb-departures/gvb-departures.html**
 
 - Real-time departures fetched from the OVapi public transport API
 - Countdown timers with colour-coded urgency (green → amber → red)
-- Stops grouped by area (West, Centrum, Oost)
+- Stops grouped by direction (Noord → West, West → Noord, Centrum, Oost)
 - Within each group, stops are automatically sorted by soonest departure
+- Shows N/A with error reason if the API is unreachable
 - Auto-refreshes every 30 seconds
-- Falls back to demo data when the API is unreachable
 
 ## Covered ferry lines
 
@@ -20,8 +20,8 @@ Live at: **https://swiaam.github.io/gvb-departures/gvb-departures.html**
 | F2 | IJplein ↔ Centraal |
 | F3 | Buiksloterweg (A'dam Tower) ↔ Centraal |
 | F4 | NDSM ↔ Centraal |
-| F6 | Distelweg ↔ Pontsteiger (West) |
-| F7 | NDSM ↔ Pontsteiger (West) |
+| F6 | Distelweg ↔ Pontsteiger |
+| F7 | NDSM ↔ Pontsteiger |
 | F1 | Azartplein (KNSM-eiland) ↔ Zamenhofstraat (Noord) |
 
 ## Customising stops
@@ -42,12 +42,15 @@ const GROUPS = [
 
 - **lineKey** — OVapi line identifier. The suffix `_1` and `_2` denote opposite directions.
 - **fromStop** — filters departures to a specific boarding point (partial match against the API stop name).
-- **hint** — small directional label shown on the card as a human-readable hint.
+- **hint** — short directional label shown on the card next to the stop name.
 
 Line keys can be looked up via the [OVapi documentation](http://v0.ovapi.nl).
 
-## Tech stack
+## Architecture
 
-- [Preact](https://preactjs.com) + [htm](https://github.com/developit/htm) — no build step required
-- Data proxied through [CodeTabs](https://codetabs.com/cors-proxy/cors-proxy.html) to work around CORS restrictions on the OVapi endpoint
-- Hosted via GitHub Pages from the `/docs` folder
+| Concern | Solution |
+|---------|----------|
+| UI | Single HTML file, no build step |
+| Frontend framework | [Preact](https://preactjs.com) + [htm](https://github.com/developit/htm), vendored locally in `docs/vendor/` |
+| Static hosting | GitHub Pages from `/docs` |
+| API proxy | Google Cloud Function (`europe-west4`) — works around CORS on OVapi, restricted to requests from this domain |
