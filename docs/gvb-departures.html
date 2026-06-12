@@ -17,10 +17,7 @@
 <body>
 <div id="root"></div>
 <script type="module">
-import { h, render, Fragment } from 'https://esm.sh/preact@10';
-import { useState, useEffect, useCallback } from 'https://esm.sh/preact@10/hooks';
-import htm from 'https://esm.sh/htm@3';
-const html = htm.bind(h);
+import { h, html, render, useState, useEffect, useCallback } from './vendor/standalone.js';
 
 // ── API ───────────────────────────────────────────────────────────────────────
 async function fetchDepartures(lineKey) {
@@ -136,7 +133,7 @@ function StopCard({ stop, onNextDep }) {
       ` : state.startsWith("error:") ? html`
         <div style=${{ color:"#4A6280", fontFamily:"'Barlow',sans-serif", fontSize:"13px", padding:"4px 0" }}>N/A — ${state.slice(6)}</div>
       ` : next ? html`
-        <${Fragment}>
+        <div>
           <div style=${{ display:"flex", alignItems:"flex-end", gap:"10px", marginBottom:"6px" }}>
             <span style=${{ fontFamily:"'Share Tech Mono',monospace", fontSize:"46px", lineHeight:1, letterSpacing:"-1px", color, textShadow:`0 0 20px ${glow}`, transition:"color .5s" }}>${fmtCountdown(next.expected)}</span>
             <span style=${{ fontSize:"13px", color:"#5A7099", fontFamily:"'Barlow',sans-serif", paddingBottom:"7px" }}>→ ${next.destination||stop.hint}</span>
@@ -148,7 +145,7 @@ function StopCard({ stop, onNextDep }) {
               `)}
             </div>
           `}
-        </${Fragment}>
+        </div>
       ` : null}
     </div>
   `;
